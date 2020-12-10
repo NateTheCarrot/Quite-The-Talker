@@ -5,4 +5,4 @@ import time
 
 with open('./config.json') as f:
     config = json.load(f)
-print(config.get("name"))
+print(config.get("name")) # w
