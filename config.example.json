@@ -1,6 +1,13 @@
+//Make sure to move your "config.json" copy of this file into ./storage.
+
 {
     "token": "",
     "id": "",
     "name": "",
-    "prefix": ""
+    "prefix": "",
+
+    "db_host": "",
+    "db_user": "",
+    "db_password": "",
+    "db_database": ""
 }
