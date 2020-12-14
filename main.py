@@ -4,7 +4,7 @@ import random
 import time
 import mysql.connector
 
-with open('./config.json') as f:
+with open('./storage/config.json') as f:
     config = json.load(f)
 
 mydb = mysql.connector.connect(
