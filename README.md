@@ -42,6 +42,10 @@ Most errors will be caused by database connections. There are a few things you c
 * Make sure your "config.json" file is in the correct spot (in /storage/), and has all the correct information.
 * Any other errors that you can't resolve? Feel free to contact me at iamnatej@gmail.com, and I'll try my best to help you.
 
+## License
+
+This repository is under BY-NC.
+
 ## Authors
 
 Nathan Jimenez - iamnatej@gmail.com
