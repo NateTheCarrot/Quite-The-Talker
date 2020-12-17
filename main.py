@@ -1,11 +1,21 @@
+# Import dependencies. The "discord" and "mysql.connector" modules may say they're not in use, but they are.
 import discord
 import json
 import random
 import time
 import mysql.connector
 
+# Load the configuration file.
 with open('./storage/config.json') as f:
     config = json.load(f)
+
+"""
+Define variables possible at the beginning.
+
+Most database and config variables are listed here.
+"""
+
+
 
 prefix = config.get("prefix")
 
@@ -22,10 +32,18 @@ myresult = mycursor.fetchone()
 
 client = discord.Client()
 def filter_message(orig):
+    """Filters out an input based on banned_words.txt.
+    
+    Parameters:
+    orig - The original input.
+
+    Returns:
+    filtered - A string that has been filtered out.
+    """
     with open('./storage/banned_words.txt', "r") as f:
         banned_words = f.read().split(";")
         filtered = orig
-        for i in range(len(banned_words)):
+        for i in range(len(banned_words)): # Loops through all banned words and replaces in string
             filtered = filtered.replace(banned_words[i], "")
     return filtered
 @client.event
@@ -33,17 +51,17 @@ async def on_ready():
     print('Currently online!')
 @client.event
 async def on_message(message):
-    if(message.author.bot):
-        return
+    if(message.author.bot): # Check if the author of the message is a bot
+        return # Return will always be used to make sure to not continue in the code, as it isn't needed.
     msg = message.content.lower()
     if(msg == prefix + "add"):
         mycursor.execute("SELECT * FROM allowed_channels WHERE channel_id = " + str(message.channel.id))
         myresult = mycursor.fetchone()
-        if(myresult == None):
+        if(myresult == None): # Essentially saying "if the channel isn't in the database"
             sql = "INSERT INTO allowed_channels (channel_id, allowed) VALUES (%s, %s)"
             val = (str(message.channel.id), 1)
             mycursor.execute(sql, val)
-            mydb.commit()
+            mydb.commit() # Push the changes to the database
             await message.channel.send("Successfully made this channel a conversating channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `qt!addword` command. \n\nTo use it, type `qt!addword <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `qt!addword How's the weather?; Very sunny!`")
         else:
             await message.channel.send("Sorry, this is already a conversating channel. If you would like to remove it as a conversating channel, run the `qt!remove` command.")
@@ -51,14 +69,14 @@ async def on_message(message):
 
 
     if(msg == prefix + "remove"):
-        mycursor.execute("UPDATE allowed_channels SET allowed = 0 WHERE channel_id = " + str(message.channel.id))
+        mycursor.execute("UPDATE allowed_channels SET allowed = 0 WHERE channel_id = " + str(message.channel.id)) # Does not return an error if the channel doesn't exist in the database.
         mydb.commit()
         await message.channel.send("Successfully made this a non-conversating channel.")
         return
 
 
     if(msg == prefix + "init"):
-        if(str(message.author.id) != config.get("owner_id")):
+        if(str(message.author.id) != config.get("owner_id")): # Make sure it is the owner of the bot running the command
             return
         else:
             await message.channel.send("**ONLY USE THIS COMMAND ONCE PER INITIALIZATION!**\n\nIf you deleted the messages table and readded it, then you may run this command again.")
@@ -68,20 +86,22 @@ async def on_message(message):
             mycursor.execute("INSERT INTO messages (sentences, replies) VALUES (\"what's up\", \"hey, hi, hello, what's up\")")
             mycursor.execute("INSERT INTO messages (sentences, replies) VALUES (\"what's your name\", \"charles, mary, ymir, henrick\")")
             mydb.commit()
+
+
     if(msg.startswith(prefix + "addphrase")):
         word = msg.split("; ")
-        word[0] = word[0].replace("qt!addphrase ", "")
+        word[0] = word[0].replace("qt!addphrase ", "") # Separate it into the original word and the new reply
         mycursor.execute("SELECT * FROM messages WHERE sentences = '" + str(filter_message(word[0])) + "'")
         myresult = mycursor.fetchone()
-        if(myresult != None):
-            if(word[1] not in myresult[2]):
+        if(myresult != None): # If it can find the original word
+            if(word[1] not in myresult[2]): # If the reply doesn't already exist
                 mycursor.execute("UPDATE messages SET replies = '" + myresult[2] + ", " + filter_message(word[1]) + "' WHERE sentences = '" + filter_message(word[0]) + "'")
                 mydb.commit()
                 return;
-            else:
+            else: # If the reply is there
                 await message.channel.send("That reply is already added to the list of replies for that word.")
                 return;
-        else:
+        else: # If the original word doesn't exist
             sql = "INSERT INTO messages (sentences, replies) VALUES (%s, %s)"
             val = (filter_message(word[0]), filter_message(word[1]))
             mycursor.execute(sql, val)
@@ -89,16 +109,17 @@ async def on_message(message):
             return;
         return;
 
+
     mycursor.execute("SELECT * FROM allowed_channels WHERE channel_id = " + str(message.channel.id))
     myresult = mycursor.fetchone()
-    if(myresult != None):
+    if(myresult != None): # If it knows the word
         mycursor.execute("SELECT * FROM messages WHERE sentences = '" + filter_message(msg) + "'")
         myresult = mycursor.fetchone()
         if(myresult != None):
             replies_to_use = myresult[2].split(", ")
-            true_reply = random.choice(replies_to_use)
+            true_reply = random.choice(replies_to_use) # random.choice() is very useful for what I'm trying to do, select a random value from an array.
             async with message.channel.typing():
-                time.sleep(len(true_reply) / 5)
+                time.sleep(len(true_reply) / 5) # / 5 to make it more realistic. That means a 10 letter word would take 2 seconds to type.
             await message.channel.send(true_reply)
         else:
             await message.add_reaction("🧠")
