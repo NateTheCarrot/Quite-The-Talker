@@ -23,7 +23,7 @@ A unique chatting bot for discord.
 ### Installing
 
 Press the "Code" button, and either clone it with the provided HTTPS/SSH links or download the ZIP file.
-![Code Image](storage\images\code_image.png)
+![Code Image](https://i.imgur.com/d1vi6PK.png)
 
 [Make sure to link the .sql files to a database you create.](https://www.youtube.com/watch?v=C9AGrSJ6ZB0)
 Make a copy of the config.example.json file named "config.json". Move this to the storage folder, and put in your details in the respective places. Also, if you want to add banned words, go to the banned_words.txt file and add ";yourphrasehere". The values are separated by semicolons. After this, make sure to run the "creation.sql" file. When working (running in the console), run the `prefix!init` command to add samples to your database. `prefix!add` will add the channel to a list of channels that the bot can work on, and `prefix!remove` will remove the channel.
@@ -38,7 +38,7 @@ Make a copy of the config.example.json file named "config.json". Move this to th
 Most errors will be caused by database connections. There are a few things you could do.
 
 * Make sure your SQL files are actually connected to the database. In DBeaver, you can see in the top right if you are connected to a database and host. If any of these are N/A, then you will need to select the proper item.
-![DBeaver Connections](storage\images\dbeaver_image.png)
+![DBeaver Connections](https://i.imgur.com/ZxT7yoS.png)
 * Make sure your "config.json" file is in the correct spot (in /storage/), and has all the correct information.
 * Any other errors that you can't resolve? Feel free to contact me at iamnatej@gmail.com, and I'll try my best to help you.
 
