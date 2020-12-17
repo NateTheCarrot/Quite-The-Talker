@@ -96,7 +96,10 @@ async def on_message(message):
         myresult = mycursor.fetchone()
         if(myresult != None):
             replies_to_use = myresult[2].split(", ")
-            await message.channel.send(random.choice(replies_to_use))
+            true_reply = random.choice(replies_to_use)
+            async with message.channel.typing():
+                time.sleep(len(true_reply) / 5)
+            await message.channel.send(true_reply)
         else:
             await message.add_reaction("🧠")
     else:
