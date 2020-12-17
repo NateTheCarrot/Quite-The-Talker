@@ -31,6 +31,25 @@ mycursor = mydb.cursor()
 myresult = mycursor.fetchone()
 
 client = discord.Client()
+def check_if_blacklisted(user):
+    """Checks if a user is blacklisted based on blacklisted_users.txt
+    
+    Parameters:
+    user - The user to check, their ID.
+
+    Returns:
+    blacklisted - a boolean which is True or False if they are blacklisted.
+    """
+    blacklisted = False
+    with open('./storage/blacklisted_users.txt', "r") as f:
+        blacklisted_users = f.read().split(";")
+        for i in range(len(blacklisted_users)):
+            if(blacklisted_users[i] == user):
+                blacklisted = True
+                return blacklisted
+            else:
+                continue
+    return blacklisted
 def filter_message(orig):
     """Filters out an input based on banned_words.txt.
     
@@ -51,7 +70,7 @@ async def on_ready():
     print('Currently online!')
 @client.event
 async def on_message(message):
-    if(message.author.bot): # Check if the author of the message is a bot
+    if(message.author.bot or check_if_blacklisted(str(message.author.id))): # Check if the author of the message is a bot or is blacklisted
         return # Return will always be used to make sure to not continue in the code, as it isn't needed.
     msg = message.content.lower()
     if(msg == prefix + "add"):
@@ -62,7 +81,7 @@ async def on_message(message):
             val = (str(message.channel.id), 1)
             mycursor.execute(sql, val)
             mydb.commit() # Push the changes to the database
-            await message.channel.send("Successfully made this channel a conversating channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `qt!addword` command. \n\nTo use it, type `qt!addword <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `qt!addword How's the weather?; Very sunny!`")
+            await message.channel.send("Successfully made this channel a conversating channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `qt!addphrase` command. \n\nTo use it, type `qt!addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `qt!addphrase How's the weather?; Very sunny!`")
         else:
             await message.channel.send("Sorry, this is already a conversating channel. If you would like to remove it as a conversating channel, run the `qt!remove` command.")
         return
@@ -97,6 +116,7 @@ async def on_message(message):
             if(word[1] not in myresult[2]): # If the reply doesn't already exist
                 mycursor.execute("UPDATE messages SET replies = '" + myresult[2] + ", " + filter_message(word[1]) + "' WHERE sentences = '" + filter_message(word[0]) + "'")
                 mydb.commit()
+                await message.channel.send("Successfully added reply, thanks for contributing!")
                 return;
             else: # If the reply is there
                 await message.channel.send("That reply is already added to the list of replies for that word.")
@@ -106,6 +126,7 @@ async def on_message(message):
             val = (filter_message(word[0]), filter_message(word[1]))
             mycursor.execute(sql, val)
             mydb.commit()
+            await message.channel.send("Successfully added reply, thanks for contributing!")
             return;
         return;
 
@@ -119,7 +140,7 @@ async def on_message(message):
             replies_to_use = myresult[2].split(", ")
             true_reply = random.choice(replies_to_use) # random.choice() is very useful for what I'm trying to do, select a random value from an array.
             async with message.channel.typing():
-                time.sleep(len(true_reply) / 5) # / 5 to make it more realistic. That means a 10 letter word would take 2 seconds to type.
+                time.sleep(len(true_reply) / 7) # / 7 to make it more realistic. That means a 7 letter word would take 7 seconds to type.
             await message.channel.send(true_reply)
         else:
             await message.add_reaction("🧠")
