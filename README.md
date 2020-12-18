@@ -19,7 +19,7 @@ A unique chatting bot for discord.
 * random module
 * time module
 * mysql.connector module
-
+* validators module
 ### Installing
 
 Press the "Code" button, and either clone it with the provided HTTPS/SSH links or download the ZIP file.

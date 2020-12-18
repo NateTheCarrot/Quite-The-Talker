@@ -4,6 +4,7 @@ import json
 import random
 import time
 import mysql.connector
+import validators
 
 # Load the configuration file.
 with open('./storage/config.json') as f:
@@ -108,6 +109,8 @@ async def on_message(message):
 
 
     if(msg.startswith(prefix + "addphrase")):
+        if("@" in msg):
+            return
         word = msg.split("; ")
         word[0] = word[0].replace("qt!addphrase ", "") # Separate it into the original word and the new reply
         mycursor.execute("SELECT * FROM messages WHERE sentences = '" + str(filter_message(word[0])) + "'")
@@ -139,9 +142,15 @@ async def on_message(message):
         if(myresult != None):
             replies_to_use = myresult[2].split(", ")
             true_reply = random.choice(replies_to_use) # random.choice() is very useful for what I'm trying to do, select a random value from an array.
-            async with message.channel.typing():
-                time.sleep(len(true_reply) / 7) # / 7 to make it more realistic. That means a 7 letter word would take 7 seconds to type.
-            await message.channel.send(true_reply)
+            if(validators.url(true_reply)):
+                await message.channel.send(true_reply)
+                return
+            else:
+                async with message.channel.typing():
+                    time.sleep(len(true_reply) / 10) # / 10 to make it more realistic (and faster). That means a 10 letter word would take 10 seconds to type.
+                    await message.channel.send(true_reply)
+                return;
+
         else:
             await message.add_reaction("🧠")
     else:
