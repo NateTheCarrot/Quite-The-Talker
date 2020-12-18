@@ -6,7 +6,7 @@
     "name": "",
     "prefix": "",
     "owner_id": "", // Your ID
-    "log_id", // Log channel ID
+    "logs_id": "", // Log channel ID
     
     "db_host": "", // localhost in most cases
     "db_user": "",

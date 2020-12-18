@@ -75,7 +75,7 @@ async def on_ready():
     print('Currently online!')
     await client.change_presence(activity=discord.Streaming(name= prefix + "help", url="https://twitch.tv/NateTheCarrot"))
     global log_channel
-    log_channel = client.get_channel(config.get("log_id"))
+    log_channel = client.get_channel(config.get("logs_id"))
 
 @client.event
 async def on_message(message):
@@ -90,12 +90,13 @@ async def on_message(message):
             val = (str(message.channel.id), 1)
             mycursor.execute(sql, val)
             mydb.commit() # Push the changes to the database
-            await message.channel.send("Successfully made this channel a conversating channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `qt!addphrase` command. \n\nTo use it, type `qt!addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `qt!addphrase How's the weather?; Very sunny!`")
+            # Also, f strings help a lot with not having to use + prefix + all the time.
+            await message.channel.send(f"Successfully made this channel a conversating channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `{prefix}addphrase` command. \n\nTo use it, type `{prefix}addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `{prefix}addphrase How's the weather?; Very sunny!`")
         elif(myresult[2] == 1):
-            await message.channel.send("Sorry, this is already a conversating channel. If you would like to remove it as a conversating channel, run the `qt!remove` command.")
+            await message.channel.send(f"Sorry, this is already a conversating channel. If you would like to remove it as a conversating channel, run the `{prefix}!remove` command.")
             return
         else:
-            await message.channel.send("Successfully made this channel a conversating channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `qt!addphrase` command. \n\nTo use it, type `qt!addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `qt!addphrase How's the weather?; Very sunny!`")
+            await message.channel.send(f"Successfully made this channel a conversating channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `qtaddphrase` command. \n\nTo use it, type `{prefix}addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `{prefix}addphrase How's the weather?; Very sunny!`")
             mycursor.execute("UPDATE allowed_channels SET allowed = 1 WHERE channel_id = " + str(message.channel.id))
             mydb.commit()
             return
@@ -126,7 +127,7 @@ async def on_message(message):
         if("@" in msg):
             return
         word = msg.split("; ")
-        word[0] = word[0].replace("qt!addphrase ", "") # Separate it into the original word and the new reply
+        word[0] = word[0].replace(prefix + "addphrase ", "") # Separate it into the original word and the new reply
         mycursor.execute("SELECT * FROM messages WHERE sentences = '" + str(filter_message(word[0])) + "'")
         myresult = mycursor.fetchone()
         if(myresult != None): # If it can find the original word
@@ -134,7 +135,7 @@ async def on_message(message):
                 mycursor.execute("UPDATE messages SET replies = '" + myresult[2] + ", " + filter_message(word[1]) + "' WHERE sentences = '" + filter_message(word[0]) + "'")
                 mydb.commit()
                 await message.channel.send("Successfully added reply, thanks for contributing!")
-                await log_channel.send("<@" + str(message.author.id) + "> added word \"*" + filter_message(word[1]) + "*\" to **" + filter_message(word[0]) + "**")
+                await log_channel.send("<@" + str(message.author.id) + "> added phrase \"*" + filter_message(word[1]) + "*\" to **" + filter_message(word[0]) + "**")
                 return;
             else: # If the reply is there
                 await message.channel.send("That reply is already added to the list of replies for that word.")
@@ -145,12 +146,12 @@ async def on_message(message):
             mycursor.execute(sql, val)
             mydb.commit()
             await message.channel.send("Successfully added reply, thanks for contributing!")
-            await log_channel.send("<@" + str(message.author.id) + "> added word " + filter_message(word[1]) + " to " + filter_message(word[0]))
+            await log_channel.send("<@" + str(message.author.id) + "> added phrase \"*" + filter_message(word[1]) + "*\" to **" + filter_message(word[0]) + "**")
             return;
         return;
 
     if(msg == prefix + "help"):
-        await message.channel.send("**Commands:**\n__qt!add__ - Allows the channel the command is used in to participate in the bot (have the bot conversate)\n__qt!remove__ - Disallows the bot to conversate in the channel the command is used in.\n__qt!addphrase <original phrase>; <response>__ - Lets you add a new phrase to the bot. (Example: `qt!addphrase How's the weather?; Very sunny!`)")
+        await message.channel.send(f"**Commands:**\n__{prefix}add__ - Allows the channel the command is used in to participate in the bot (have the bot conversate)\n__{prefix}remove__ - Disallows the bot to conversate in the channel the command is used in.\n__{prefix}addphrase <original phrase>; <response>__ - Lets you add a new phrase to the bot. (Example: `{prefix}addphrase How's the weather?; Very sunny!`)\n__{prefix}init__ - Initializes the database by adding a few premade sentences and replies. Should only be run once! Can only be run by the bot owner.")
     mycursor.execute("SELECT * FROM allowed_channels WHERE channel_id = " + str(message.channel.id))
     myresult = mycursor.fetchone()
     if(myresult != None): # If it knows the word
@@ -163,7 +164,7 @@ async def on_message(message):
                 await message.channel.send(true_reply)
                 return
             else:
-                async with message.channel.typing():
+                async with message.channel.typing(): # Occasionally will duplicate the typing if server connection issues occur
                     time.sleep(len(true_reply) / 10) # / 10 to make it more realistic (and faster). That means a 10 letter word would take 10 seconds to type.
                     await message.channel.send(true_reply)
                 return;
