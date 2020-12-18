@@ -5,6 +5,7 @@ A unique chatting bot for discord.
 ## Description
 
 "Quite the Talker" is a Discord bot that utilizes a database to store replies and sentences. When activated in a channel, it will talk normally based on what the community decides. For example, if the users want a reply to their "What's up?" with "Nothing much.", then the bot will store that in the database. Everything in the database can easily be edited.
+**Official Bot Invite**: https://discord.com/oauth2/authorize?client_id=786626995755810897&permissions=67648&scope=bot
 
 ## Get Started
 
