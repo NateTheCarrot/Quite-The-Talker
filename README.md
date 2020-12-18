@@ -53,4 +53,4 @@ Nathan Jimenez - iamnatej@gmail.com
 
 ## Credits
 
-Lots of thanks for https://www.w3schools.com/ . They helped a lot in helping me prepare and work through the project.
+Lots of thanks for [w3schools](https://www.w3schools.com/) . They helped a lot in helping me prepare and work through the project.
