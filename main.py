@@ -69,6 +69,7 @@ def filter_message(orig):
 @client.event
 async def on_ready():
     print('Currently online!')
+    await client.change_presence(activity=discord.Streaming(name= prefix + "help", url="https://twitch.tv/NateTheCarrot"))
 @client.event
 async def on_message(message):
     if(message.author.bot or check_if_blacklisted(str(message.author.id))): # Check if the author of the message is a bot or is blacklisted
@@ -133,7 +134,8 @@ async def on_message(message):
             return;
         return;
 
-
+    if(msg == prefix + "help"):
+        await message.channel.send("**Commands:**\n__qt!add__ - Allows the channel the command is used in to participate in the bot (have the bot conversate)\n__qt!remove__ - Disallows the bot to conversate in the channel the command is used in.\n__qt!addphrase <original phrase>; <response>__ - Lets you add a new phrase to the bot. (Example: `qt!addphrase How's the weather?; Very sunny!`)")
     mycursor.execute("SELECT * FROM allowed_channels WHERE channel_id = " + str(message.channel.id))
     myresult = mycursor.fetchone()
     if(myresult != None): # If it knows the word
