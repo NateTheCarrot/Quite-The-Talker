@@ -6,7 +6,7 @@
     "name": "",
     "prefix": "",
     "owner_id": "", // Your ID
-    "logs_id": "", // Log channel ID
+    "logs_id": 1, // Log channel ID - Make sure it is an integer, not in a string.
     
     "db_host": "", // localhost in most cases
     "db_user": "",
