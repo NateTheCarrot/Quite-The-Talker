@@ -1,4 +1,4 @@
-// Make sure to move your "config.json" copy of this file into ./storage.
+// Make sure to move your "config.json" copy of this file into ./storage, as well as delete these comments.
 
 {
     "token": "",
@@ -6,6 +6,7 @@
     "name": "",
     "prefix": "",
     "owner_id": "", // Your ID
+    "log_id", // Log channel ID
     
     "db_host": "", // localhost in most cases
     "db_user": "",

@@ -31,7 +31,10 @@ mycursor = mydb.cursor()
 
 myresult = mycursor.fetchone()
 
+log_channel = None
+
 client = discord.Client()
+
 def check_if_blacklisted(user):
     """Checks if a user is blacklisted based on blacklisted_users.txt
     
@@ -66,10 +69,14 @@ def filter_message(orig):
         for i in range(len(banned_words)): # Loops through all banned words and replaces in string
             filtered = filtered.replace(banned_words[i], "")
     return filtered
+
 @client.event
 async def on_ready():
     print('Currently online!')
     await client.change_presence(activity=discord.Streaming(name= prefix + "help", url="https://twitch.tv/NateTheCarrot"))
+    global log_channel
+    log_channel = client.get_channel(config.get("log_id"))
+
 @client.event
 async def on_message(message):
     if(message.author.bot or check_if_blacklisted(str(message.author.id))): # Check if the author of the message is a bot or is blacklisted
@@ -84,8 +91,14 @@ async def on_message(message):
             mycursor.execute(sql, val)
             mydb.commit() # Push the changes to the database
             await message.channel.send("Successfully made this channel a conversating channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `qt!addphrase` command. \n\nTo use it, type `qt!addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `qt!addphrase How's the weather?; Very sunny!`")
-        else:
+        elif(myresult[2] == 1):
             await message.channel.send("Sorry, this is already a conversating channel. If you would like to remove it as a conversating channel, run the `qt!remove` command.")
+            return
+        else:
+            await message.channel.send("Successfully made this channel a conversating channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `qt!addphrase` command. \n\nTo use it, type `qt!addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `qt!addphrase How's the weather?; Very sunny!`")
+            mycursor.execute("UPDATE allowed_channels SET allowed = 1 WHERE channel_id = " + str(message.channel.id))
+            mydb.commit()
+            return
         return
 
 
@@ -121,6 +134,7 @@ async def on_message(message):
                 mycursor.execute("UPDATE messages SET replies = '" + myresult[2] + ", " + filter_message(word[1]) + "' WHERE sentences = '" + filter_message(word[0]) + "'")
                 mydb.commit()
                 await message.channel.send("Successfully added reply, thanks for contributing!")
+                await log_channel.send("<@" + str(message.author.id) + "> added word \"*" + filter_message(word[1]) + "*\" to **" + filter_message(word[0]) + "**")
                 return;
             else: # If the reply is there
                 await message.channel.send("That reply is already added to the list of replies for that word.")
@@ -131,6 +145,7 @@ async def on_message(message):
             mycursor.execute(sql, val)
             mydb.commit()
             await message.channel.send("Successfully added reply, thanks for contributing!")
+            await log_channel.send("<@" + str(message.author.id) + "> added word " + filter_message(word[1]) + " to " + filter_message(word[0]))
             return;
         return;
 
