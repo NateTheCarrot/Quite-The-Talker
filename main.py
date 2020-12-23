@@ -83,6 +83,7 @@ async def on_message(message):
         return # Return will always be used to make sure to not continue in the code, as it isn't needed.
     msg = message.content.lower()
     if(msg == prefix + "add"):
+        
         mycursor.execute("SELECT * FROM allowed_channels WHERE channel_id = " + str(message.channel.id))
         myresult = mycursor.fetchone()
         if(myresult == None): # Essentially saying "if the channel isn't in the database"
@@ -104,6 +105,7 @@ async def on_message(message):
 
 
     if(msg == prefix + "remove"):
+        
         mycursor.execute("UPDATE allowed_channels SET allowed = 0 WHERE channel_id = " + str(message.channel.id)) # Does not return an error if the channel doesn't exist in the database.
         mydb.commit()
         await message.channel.send("Successfully made this a non-conversating channel.")
@@ -111,6 +113,7 @@ async def on_message(message):
 
 
     if(msg == prefix + "init"):
+        
         if(str(message.author.id) != config.get("owner_id")): # Make sure it is the owner of the bot running the command
             return
         else:
@@ -124,10 +127,14 @@ async def on_message(message):
 
 
     if(msg.startswith(prefix + "addphrase")):
+        
         if("@" in msg):
             return
+        
         word = msg.split("; ")
-        word[0] = word[0].replace(prefix + "addphrase ", "") # Separate it into the original word and the new reply
+        word[0] = word[0].replace(prefix + "addphrase ", "", 1) # Separate it into the original word and the new reply
+        if(word[0].startswith(prefix)):
+            return
         mycursor.execute("SELECT * FROM messages WHERE sentences = '" + str(filter_message(word[0])) + "'")
         myresult = mycursor.fetchone()
         if(myresult != None): # If it can find the original word
@@ -151,26 +158,30 @@ async def on_message(message):
         return;
 
     if(msg == prefix + "help"):
+        
         await message.channel.send(f"**Commands:**\n__{prefix}add__ - Allows the channel the command is used in to participate in the bot (have the bot conversate)\n__{prefix}remove__ - Disallows the bot to conversate in the channel the command is used in.\n__{prefix}addphrase <original phrase>; <response>__ - Lets you add a new phrase to the bot. (Example: `{prefix}addphrase How's the weather?; Very sunny!`)\n__{prefix}init__ - Initializes the database by adding a few premade sentences and replies. Should only be run once! Can only be run by the bot owner.")
     mycursor.execute("SELECT * FROM allowed_channels WHERE channel_id = " + str(message.channel.id))
     myresult = mycursor.fetchone()
-    if(myresult[2] != 0): # If it can go in the channel
-        mycursor.execute("SELECT * FROM messages WHERE sentences = '" + filter_message(msg) + "'")
-        myresult = mycursor.fetchone()
-        if(myresult != None):
-            replies_to_use = myresult[2].split(", ")
-            true_reply = random.choice(replies_to_use) # random.choice() is very useful for what I'm trying to do, select a random value from an array.
-            if(validators.url(true_reply)):
-                await message.channel.send(true_reply)
-                return
-            else:
-                async with message.channel.typing(): # Occasionally will duplicate the typing if server connection issues occur - EDIT: Still may happen if connection errors occur, but too a much less degree.
-                    time.sleep(len(true_reply) / 10) # / 10 to make it more realistic (and faster). That means a 10 letter word would take 10 seconds to type.
-                await message.channel.send(true_reply)
-                return
+    if(myresult is not None):
+        if(myresult[2] != 0): # If it can go in the channel
+            mycursor.execute("SELECT * FROM messages WHERE sentences = '" + filter_message(msg) + "'")
+            myresult = mycursor.fetchone()
+            if(myresult != None):
+                replies_to_use = myresult[2].split(", ")
+                true_reply = random.choice(replies_to_use) # random.choice() is very useful for what I'm trying to do, select a random value from an array.
+                if(validators.url(true_reply)):
+                    await message.channel.send(true_reply)
+                    return
+                else:
+                    async with message.channel.typing(): # Occasionally will duplicate the typing if server connection issues occur - EDIT: Still may happen if connection errors occur, but too a much less degree.
+                        time.sleep(len(true_reply) / 10) # / 10 to make it more realistic (and faster). That means a 10 letter word would take 10 seconds to type.
+                    await message.channel.send(true_reply)
+                    return
 
+            else:
+                await message.add_reaction("🧠")
         else:
-            await message.add_reaction("🧠")
+            return
     else:
         return
 client.run(config.get("token"))
