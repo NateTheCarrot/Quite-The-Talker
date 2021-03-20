@@ -29,7 +29,7 @@ mydb = mysql.connector.connect(
 
 mycursor = mydb.cursor()
 
-myresult = mycursor.fetchone()
+#myresult = mycursor.fetchone()
 
 log_channel = None
 
