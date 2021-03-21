@@ -91,12 +91,12 @@ async def on_message(message):
                 mycursor.execute(sql, val)
                 mydb.commit() # Push the changes to the database
                 # Also, f strings help a lot with not having to use + prefix + all the time.
-                await message.channel.send(f"Successfully made this channel a conversating channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `{prefix}addphrase` command. \n\nTo use it, type `{prefix}addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `{prefix}addphrase How's the weather?; Very sunny!`")
+                await message.channel.send(f"Successfully made this channel a conversing channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `{prefix}addphrase` command. \n\nTo use it, type `{prefix}addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `{prefix}addphrase How's the weather?; Very sunny!`")
             elif(myresult[2] == 1):
-                await message.channel.send(f"Sorry, this is already a conversating channel. If you would like to remove it as a conversating channel, run the `{prefix}remove` command.")
+                await message.channel.send(f"Sorry, this is already a conversing channel. If you would like to remove it as a conversing channel, run the `{prefix}remove` command.")
                 return
             else:
-                await message.channel.send(f"Successfully made this channel a conversating channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `qtaddphrase` command. \n\nTo use it, type `{prefix}addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `{prefix}addphrase How's the weather?; Very sunny!`")
+                await message.channel.send(f"Successfully made this channel a conversing channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `qtaddphrase` command. \n\nTo use it, type `{prefix}addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `{prefix}addphrase How's the weather?; Very sunny!`")
                 mycursor.execute("UPDATE allowed_channels SET allowed = 1 WHERE channel_id = " + str(message.channel.id))
                 mydb.commit()
                 return
@@ -109,7 +109,7 @@ async def on_message(message):
         if message.author.guild_permissions.manage_channels:
             mycursor.execute("UPDATE allowed_channels SET allowed = 0 WHERE channel_id = " + str(message.channel.id)) # Does not return an error if the channel doesn't exist in the database.
             mydb.commit()
-            await message.channel.send("Successfully made this a non-conversating channel.")
+            await message.channel.send("Successfully made this a non-conversing channel.")
             return
         else:
             await message.channel.send(f"Sorry, you need the `MANAGE_CHANNELS` permission to do that. If you believe this is a mistake, please contact <@{owner_id}>.")
