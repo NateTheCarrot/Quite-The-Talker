@@ -12,7 +12,6 @@ with open('./storage/config.json') as f:
 
 """
 Define variables possible at the beginning.
-
 Most database and config variables are listed here.
 """
 
@@ -40,7 +39,6 @@ def check_if_blacklisted(user):
     
     Parameters:
     user - The user to check, their ID.
-
     Returns:
     blacklisted - a boolean which is True or False if they are blacklisted.
     """
@@ -59,7 +57,6 @@ def filter_message(orig):
     
     Parameters:
     orig - The original input.
-
     Returns:
     filtered - A string that has been filtered out.
     """
@@ -83,7 +80,6 @@ async def on_message(message):
         return # Return will always be used to make sure to not continue in the code, as it isn't needed.
     msg = message.content.lower()
     if(msg == prefix + "add"):
-        
         mycursor.execute("SELECT * FROM allowed_channels WHERE channel_id = " + str(message.channel.id))
         myresult = mycursor.fetchone()
         if(myresult == None): # Essentially saying "if the channel isn't in the database"
@@ -105,7 +101,6 @@ async def on_message(message):
 
 
     if(msg == prefix + "remove"):
-        
         mycursor.execute("UPDATE allowed_channels SET allowed = 0 WHERE channel_id = " + str(message.channel.id)) # Does not return an error if the channel doesn't exist in the database.
         mydb.commit()
         await message.channel.send("Successfully made this a non-conversating channel.")
@@ -113,7 +108,6 @@ async def on_message(message):
 
 
     if(msg == prefix + "init"):
-        
         if(str(message.author.id) != config.get("owner_id")): # Make sure it is the owner of the bot running the command
             return
         else:
@@ -127,14 +121,10 @@ async def on_message(message):
 
 
     if(msg.startswith(prefix + "addphrase")):
-        
         if("@" in msg):
             return
-        
         word = msg.split("; ")
-        word[0] = word[0].replace(prefix + "addphrase ", "", 1) # Separate it into the original word and the new reply
-        if(word[0].startswith(prefix)):
-            return
+        word[0] = word[0].replace(prefix + "addphrase ", "") # Separate it into the original word and the new reply
         mycursor.execute("SELECT * FROM messages WHERE sentences = '" + str(filter_message(word[0])) + "'")
         myresult = mycursor.fetchone()
         if(myresult != None): # If it can find the original word
@@ -158,11 +148,10 @@ async def on_message(message):
         return;
 
     if(msg == prefix + "help"):
-        
         await message.channel.send(f"**Commands:**\n__{prefix}add__ - Allows the channel the command is used in to participate in the bot (have the bot conversate)\n__{prefix}remove__ - Disallows the bot to conversate in the channel the command is used in.\n__{prefix}addphrase <original phrase>; <response>__ - Lets you add a new phrase to the bot. (Example: `{prefix}addphrase How's the weather?; Very sunny!`)\n__{prefix}init__ - Initializes the database by adding a few premade sentences and replies. Should only be run once! Can only be run by the bot owner.")
     mycursor.execute("SELECT * FROM allowed_channels WHERE channel_id = " + str(message.channel.id))
     myresult = mycursor.fetchone()
-    if(myresult is not None):
+    try:
         if(myresult[2] != 0): # If it can go in the channel
             mycursor.execute("SELECT * FROM messages WHERE sentences = '" + filter_message(msg) + "'")
             myresult = mycursor.fetchone()
@@ -181,6 +170,6 @@ async def on_message(message):
                 await message.add_reaction("🧠")
         else:
             return
-    else:
-        return
+    except TypeError:
+        return;
 client.run(config.get("token"))
