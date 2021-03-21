@@ -162,11 +162,7 @@ async def on_message(message):
         await message.channel.send(f"**Commands:**\n__{prefix}add__ - Allows the channel the command is used in to participate in the bot (have the bot conversate)\n__{prefix}remove__ - Disallows the bot to conversate in the channel the command is used in.\n__{prefix}addphrase <original phrase>; <response>__ - Lets you add a new phrase to the bot. (Example: `{prefix}addphrase How's the weather?; Very sunny!`)\n__{prefix}init__ - Initializes the database by adding a few premade sentences and replies. Should only be run once! Can only be run by the bot owner.")
     mycursor.execute("SELECT * FROM allowed_channels WHERE channel_id = " + str(message.channel.id))
     myresult = mycursor.fetchone()
-<<<<<<< HEAD
     if(myresult is not None):
-=======
-    try:
->>>>>>> origin/main
         if(myresult[2] != 0): # If it can go in the channel
             mycursor.execute("SELECT * FROM messages WHERE sentences = '" + filter_message(msg) + "'")
             myresult = mycursor.fetchone()
@@ -181,19 +177,10 @@ async def on_message(message):
                         time.sleep(len(true_reply) / 10) # / 10 to make it more realistic (and faster). That means a 10 letter word would take 10 seconds to type.
                     await message.channel.send(true_reply)
                     return
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
             else:
                 await message.add_reaction("🧠")
         else:
             return
-<<<<<<< HEAD
     else:
         return
-=======
-    except TypeError:
-        return;
->>>>>>> origin/main
 client.run(config.get("token"))
