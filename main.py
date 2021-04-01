@@ -5,6 +5,7 @@ import random
 import time
 import mysql.connector
 import validators
+import asyncio
 
 # Load the configuration file.
 with open('./storage/config.json') as f:
@@ -171,9 +172,9 @@ async def on_message(message):
                     return
                 else:
                     async with message.channel.typing(): # Occasionally will duplicate the typing if server connection issues occur - EDIT: Still may happen if connection errors occur, but too a much less degree.
-                        time.sleep(len(true_reply) / 10) # / 10 to make it more realistic (and faster). That means a 10 letter word would take 10 seconds to type.
-                    await message.channel.send(true_reply)
-                    return
+                        await asyncio.sleep(len(true_reply) / 10) # / 10 to make it more realistic (and faster). That means a 10 letter word would take 10 seconds to type.
+                        await message.channel.send(true_reply)
+                        return
             else:
                 await message.add_reaction("🧠")
         else:
