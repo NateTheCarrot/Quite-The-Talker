@@ -97,7 +97,7 @@ async def on_message(message):
                 await message.channel.send(f"Sorry, this is already a conversing channel. If you would like to remove it as a conversing channel, run the `{prefix}remove` command.")
                 return
             else:
-                await message.channel.send(f"Successfully made this channel a conversing channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `qtaddphrase` command. \n\nTo use it, type `{prefix}addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `{prefix}addphrase How's the weather?; Very sunny!`")
+                await message.channel.send(f"Successfully made this channel a conversing channel. If I react with \"🧠\" (if I have permissions), that means I don't know what that phrase is. If you see it, please run the `${prefix}addphrase` command. \n\nTo use it, type `{prefix}addphrase <original phrase>; <response>`. Make sure there is a space between the semicolon and the new reply.\n**Example:** `{prefix}addphrase How's the weather?; Very sunny!`")
                 mycursor.execute("UPDATE allowed_channels SET allowed = 1 WHERE channel_id = " + str(message.channel.id))
                 mydb.commit()
                 return
@@ -130,7 +130,7 @@ async def on_message(message):
 
 
     if(msg.startswith(prefix + "addphrase")):
-        if("@" in msg):
+        if("@" in msg or filter_message(prefix) in msg):
             return
         word = msg.split("; ")
         word[0] = word[0].replace(prefix + "addphrase ", "") # Separate it into the original word and the new reply
@@ -158,6 +158,7 @@ async def on_message(message):
 
     if(msg == prefix + "help"):
         await message.channel.send(f"**Commands:**\n__{prefix}add__ - Allows the channel the command is used in to participate in the bot (have the bot conversate)\n__{prefix}remove__ - Disallows the bot to conversate in the channel the command is used in.\n__{prefix}addphrase <original phrase>; <response>__ - Lets you add a new phrase to the bot. (Example: `{prefix}addphrase How's the weather?; Very sunny!`)\n__{prefix}init__ - Initializes the database by adding a few premade sentences and replies. Should only be run once! Can only be run by the bot owner.")
+        return
     mycursor.execute("SELECT * FROM allowed_channels WHERE channel_id = " + str(message.channel.id))
     myresult = mycursor.fetchone()
     try:
