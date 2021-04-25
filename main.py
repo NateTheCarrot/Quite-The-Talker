@@ -130,10 +130,12 @@ async def on_message(message):
 
 
     if(msg.startswith(prefix + "addphrase")):
-        if("@" in msg or filter_message(prefix) in msg):
+        if("@" in msg):
             return
         word = msg.split("; ")
         word[0] = word[0].replace(prefix + "addphrase ", "") # Separate it into the original word and the new reply
+        if(filter_message(prefix) in word[0]):
+            return
         mycursor.execute("SELECT * FROM messages WHERE sentences = '" + str(filter_message(word[0])) + "'")
         myresult = mycursor.fetchone()
         if(myresult != None): # If it can find the original word
