@@ -31,8 +31,6 @@ mycursor = mydb.cursor()
 
 #myresult = mycursor.fetchone()
 
-log_channel = None
-
 client = discord.Client()
 
 owner_id = config.get("owner_id")
@@ -143,7 +141,7 @@ async def on_message(message):
                 mycursor.execute("UPDATE messages SET replies = '" + myresult[2] + ", " + filter_message(word[1]) + "' WHERE sentences = '" + filter_message(word[0]) + "'")
                 mydb.commit()
                 await message.channel.send("Successfully added reply, thanks for contributing!")
-                await log_channel.send("<@" + str(message.author.id) + "> added phrase \"*" + filter_message(word[1]) + "*\" to **" + filter_message(word[0]) + "**")
+                await log_channel.send("<@" + str(message.author.id) + "> added phrase \"`" + filter_message(word[1]) + "`\" to `" + filter_message(word[0]) + "`")
                 return;
             else: # If the reply is there
                 await message.channel.send("That reply is already added to the list of replies for that word.")
@@ -154,7 +152,7 @@ async def on_message(message):
             mycursor.execute(sql, val)
             mydb.commit()
             await message.channel.send("Successfully added reply, thanks for contributing!")
-            await log_channel.send("<@" + str(message.author.id) + "> added phrase \"*" + filter_message(word[1]) + "*\" to **" + filter_message(word[0]) + "**")
+            await log_channel.send("<@" + str(message.author.id) + "> added phrase \"`" + filter_message(word[1]) + "`\" to `" + filter_message(word[0]) + "`")
             return;
         return;
 
