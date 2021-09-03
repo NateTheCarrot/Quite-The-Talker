@@ -142,10 +142,10 @@ async def on_message(message):
                 mydb.commit()
                 await message.channel.send("Successfully added reply, thanks for contributing!")
                 await log_channel.send("<@" + str(message.author.id) + "> added phrase \"`" + filter_message(word[1]) + "`\" to `" + filter_message(word[0]) + "`")
-                return;
+                return
             else: # If the reply is there
                 await message.channel.send("That reply is already added to the list of replies for that word.")
-                return;
+                return
         else: # If the original word doesn't exist
             sql = "INSERT INTO messages (sentences, replies) VALUES (%s, %s)"
             val = (filter_message(word[0]), filter_message(word[1]))
@@ -153,8 +153,7 @@ async def on_message(message):
             mydb.commit()
             await message.channel.send("Successfully added reply, thanks for contributing!")
             await log_channel.send("<@" + str(message.author.id) + "> added phrase \"`" + filter_message(word[1]) + "`\" to `" + filter_message(word[0]) + "`")
-            return;
-        return;
+            return
 
     if(msg == prefix + "help"):
         await message.channel.send(f"**Commands:**\n__{prefix}add__ - Allows the channel the command is used in to participate in the bot (have the bot conversate)\n__{prefix}remove__ - Disallows the bot to conversate in the channel the command is used in.\n__{prefix}addphrase <original phrase>; <response>__ - Lets you add a new phrase to the bot. (Example: `{prefix}addphrase How's the weather?; Very sunny!`)\n__{prefix}init__ - Initializes the database by adding a few premade sentences and replies. Should only be run once! Can only be run by the bot owner.")
@@ -181,5 +180,5 @@ async def on_message(message):
         else:
             return
     except TypeError:
-        return;
+        return
 client.run(config.get("token"))
