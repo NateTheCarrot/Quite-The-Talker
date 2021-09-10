@@ -40,6 +40,7 @@ def check_if_blacklisted(user):
     
     Parameters:
     user - The user to check, their ID.
+    
     Returns:
     blacklisted - a boolean which is True or False if they are blacklisted.
     """
@@ -58,6 +59,7 @@ def filter_message(orig):
     
     Parameters:
     orig - The original input.
+
     Returns:
     filtered - A string that has been filtered out.
     """
